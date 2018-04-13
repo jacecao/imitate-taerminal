@@ -1,4 +1,11 @@
 import './css/index.css';
-import {st1} from './components/test.js'
-import json from './data.json';
-document.write(`<h1>${st1}${json.a}</h1>`);
+
+import createHTML from 'components/createHTML.js';
+import stylePrint from 'components/stylePrint.js';
+
+const init = async function () {
+  let id = await createHTML();
+  stylePrint(0,id);
+}
+
+init();

@@ -2,3 +2,11 @@ body {
 	color: #fff;
 	background: color(red alpha(-20%));
 }
+.styles-wrap {
+  position: fixed;
+  width: 90vw; 
+  height: 30vh;
+  padding: .5em;
+  border: 1px solid;
+  overflow: hidden;
+}

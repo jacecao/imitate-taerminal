@@ -1,29 +1,22 @@
 const path = require('path');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-let htmlPlugin = new HtmlWebpackPlugin({
-	title: 'Echarts-DEMO'
-});
 
 const ClearWebpackPlugin = require('clean-webpack-plugin');
 let clearOptions = {
+	root: path.resolve(__dirname, '../'),
 	exclude: [],
 	verbose: true,
 	dry: false
 };
-let clear = new ClearWebpackPlugin(['dist']);
+let clear = new ClearWebpackPlugin(['dist'], clearOptions);
 
 
 module.exports = {
 	entry: path.resolve(__dirname, '../src/index.js'),
-	plugins: [
-		clear, 
-		htmlPlugin
-	],
+	plugins: [clear],
 	output: {
 		filename: 'index.bundle.js',
-		path: path.resolve(__dirname, '../dist/')
+		path: path.resolve(__dirname, '../dist/js/')
 	},
 	resolve: {
 	  extensions: ['.js', '.css', '.json'],
