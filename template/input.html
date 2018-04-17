@@ -16,6 +16,44 @@
 		  border: 1px solid;
 		  overflow: hidden;
 		}
+
+		.loading::before, .loading::after {
+			content: '.';
+			padding: 0 2px;
+		}
+		.loading {
+			animation: load-flash 0.5s infinite;
+		}
+		@keyframes load-flash {
+			0 {opacity: 0.1}
+			50% {opacity: 1}
+			100% {opacity: 0.1}
+		}
+
+		.terminal-input {
+			height: 16px;
+			line-height: 16px;
+		}
+		.terminal-input::after {
+			content: '.';
+			display: inline-block;
+			width: 6px;
+			height: 100%;
+			background: #eee;
+			animation: load-flash 1s infinite;
+		}
+		.terminal-text {
+			margin-left: 10px;
+		}
+		.terminal-input input {
+			background: transparent;
+			border: none;
+			outline: none;
+			font-size: 16px;
+			width: 1px;
+			color: #ddd;
+			opacity: 0;
+		}
 	</style>
 </head>
 <body>
@@ -23,8 +61,21 @@
 		<p>
 			system is runnig, please hol on <span class="loading">.</span>
 		</p>
-	</div>
 
+		<p class="terminal-input">
+			<span class="terminal-header">[web-system]$ </span>
+			<span class="terminal-text"></span>
+			<input class="js-hook" type="text" value="" autofocus>
+		</p>
+	</div>
+	
+	<script>
+		var input = document.querySelector('.js-hook');
+		var text = document.querySelector('.terminal-text');
+		input.addEventListener('keyup', function(){
+			text.innerText = this.value;
+		}, false);
+	</script>
 
 </body>
 </html>
