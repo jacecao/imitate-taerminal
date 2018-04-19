@@ -17,6 +17,12 @@ const _mount_target = Symbol();
 
 const _init = Symbol();
 
+
+// key-char
+// 需要监听的键盘按键名称和编码
+let _key_arr = ['Backspce','8', 'Enter', '13'];
+const key_set = new Set(_key_arr);
+
 // 默认配置
 const config = {
 	hostName: 'Terminal-SYS',
@@ -54,6 +60,7 @@ class Input {
 
 	[_init] () {
 		this[_found_html]();
+		this[_event]();
 		return this;
 	}
 
@@ -69,14 +76,17 @@ class Input {
 				<input class="watch-input-hook" type="text" value="" autofocus>
 			</p>`;
 		let _container = document.createElement('div');
+		_container.className = this[_className];
 		_container.innerHTML = _html_str;
 
 		let _fram = document.createDocumentFragment();
 		_fram.appendChild(_container);
 
 		let _mount_element = document.querySelector(`${this[_mount_target]}`);
-		console.log(_mount_element);
 		_mount_element.appendChild(_fram);
+
+		// 获取挂载元素
+		this[_get_elements]();
 	}
 
 	// 创建输入对象
@@ -86,6 +96,7 @@ class Input {
 	set input (value) {
 		this[_input_text] = value;
 		// 更新页面显示数据
+		this.elements.show_ele.innerText = this[_input_text];
 	}
 
 	// 获取内部组件元素
@@ -98,13 +109,28 @@ class Input {
 
 	// 添加事件
 	[_event] () {
-		window.addEventListener('click', function () {
+		window.addEventListener('click', () => {
 			// 输入框始终是焦点
 			this.elements.input_ele.focus();
 		}, false);
 		// 输入框绑定键盘监听
 		this.elements.input_ele.addEventListener('keyup', (e) => {
 			this.input = e.target.value;
+		}, false);
+		// 监听特色按键
+		this.elements.input_ele.addEventListener('keydown', (e) => {
+			if (key_set.has(e.keyCode) || key_set.has(e.key) ) {
+				switch (e.keyCode) {
+					case 8:
+						this.input = e.target.value;
+						break;
+					case 13:
+						this[_input_text] = e.target.value;
+						console.log(this[_input_text]);
+						break;
+				}
+			}
+			// this.input = e.target.value;
 		}, false);
 	}
 
