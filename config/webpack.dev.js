@@ -5,7 +5,7 @@ const common = require('./webpack.base.config.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 let htmlPlugin = new HtmlWebpackPlugin({
-	title: 'Echarts-DEMO',
+	title: 'Imitate-Terminal',
 	template: path.resolve(__dirname, '../index.html')
 });
 

@@ -40,16 +40,17 @@
 			width: 6px;
 			height: 100%;
 			background: #eee;
+			margin-left: -10px;
 			animation: load-flash 1s infinite;
 		}
 		.terminal-text {
-			margin-left: 10px;
+
 		}
 		.terminal-input input {
 			background: transparent;
 			border: none;
 			outline: none;
-			font-size: 16px;
+			cursor: none;
 			width: 1px;
 			color: #ddd;
 			opacity: 0;
@@ -63,7 +64,7 @@
 		</p>
 
 		<p class="terminal-input">
-			<span class="terminal-header">[web-system]$ </span>
+			<span class="terminal-header">[web-system]$</span>
 			<span class="terminal-text"></span>
 			<input class="js-hook" type="text" value="" autofocus>
 		</p>
@@ -74,6 +75,10 @@
 		var text = document.querySelector('.terminal-text');
 		input.addEventListener('keyup', function(){
 			text.innerText = this.value;
+		}, false);
+
+		window.addEventListener('click', function () {
+			input.focus();
 		}, false);
 	</script>
 

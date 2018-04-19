@@ -1,0 +1,31 @@
+.terminal-input {
+	height: 16px;
+	line-height: 16px;
+}
+.terminal-input::after {
+	content: '.';
+	display: inline-block;
+	width: 6px;
+	height: 100%;
+	background: #eee;
+	color: transparent;
+	margin-left: -10px;
+	animation: load-flash 1s infinite;
+}
+.terminal-text {
+
+}
+.terminal-input input {
+	background: transparent;
+	border: none;
+	outline: none;
+	cursor: none;
+	width: 1px;
+	color: #ddd;
+	opacity: 0;
+}
+@keyframes load-flash {
+	0 {opacity: 0.1}
+	50% {opacity: 1}
+	100% {opacity: 0.1}
+}
