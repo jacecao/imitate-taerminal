@@ -15,19 +15,22 @@ const _input_text = Symbol();
 const _className = Symbol();
 const _mount_target = Symbol();
 
+const _terminal_index = Symbol();
+
 const _init = Symbol();
 
 
 // key-char
 // 需要监听的键盘按键名称和编码
-let _key_arr = ['Backspce','8', 'Enter', '13'];
+let _key_arr = ['Backspce', 8, 'Enter', 13, 'ArrowUp', 38, 'ArrowDown', 40];
 const key_set = new Set(_key_arr);
 
 // 默认配置
 const config = {
 	hostName: 'Terminal-SYS',
 	prompt: '$',
-	mountTarget: 'body'
+	mountTarget: 'body',
+	storageSize: 10  // 设置需要记录历史操作的最大值
 };
 
 // 定义 输入组件类
@@ -47,7 +50,8 @@ class Input {
 		// 记录当前地址
 		this.path = '';
 		// 记录当前输入内容
-		this[_input_text] = '';
+		this[_input_text] = new Array();
+		this[_terminal_index] = 0;
 		// 记录当前元素className
 		this[_className] = '';
 		// 元素是否已经挂载到页面
@@ -91,12 +95,11 @@ class Input {
 
 	// 创建输入对象
 	get input () {
-		return this[_input_text];
+		return this[_input_text][_terminal_index];
 	}
 	set input (value) {
-		this[_input_text] = value;
 		// 更新页面显示数据
-		this.elements.show_ele.innerText = this[_input_text];
+		this.elements.show_ele.innerText = value;
 	}
 
 	// 获取内部组件元素
@@ -119,21 +122,38 @@ class Input {
 		}, false);
 		// 监听特色按键
 		this.elements.input_ele.addEventListener('keydown', (e) => {
+
+			// console.log(e.key, e.keyCode);
 			if (key_set.has(e.keyCode) || key_set.has(e.key) ) {
 				switch (e.keyCode) {
 					case 8:
 						this.input = e.target.value;
 						break;
-					case 13:
-						this[_input_text] = e.target.value;
+
+					case 13: // 回车
+						// 检查记录输入命令的个数
+						// 如果记录的输入命令大于10个
+						// 那么需要删除最后一个值，并在第一个位置追加新值
+						if (this[_input_text].length === config.storageSize) {
+							this[_input_text].shift();
+						}
+						this[_input_text].push(e.target.value);
+						this[_terminal_index] = this[_input_text].length - 1;
 						console.log(this[_input_text]);
+						break;
+
+					case 38:
+						if (this[_terminal_index] > 0) {
+							this[_terminal_index] --;
+							this.input = this[_input_text][_terminal_index];
+						} else if (this[_input_text].length > 0){
+							this.input = this[_input_text][0];
+						}
 						break;
 				}
 			}
-			// this.input = e.target.value;
 		}, false);
 	}
-
 }
 
 export default Input;
