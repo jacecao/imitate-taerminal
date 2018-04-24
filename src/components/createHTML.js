@@ -1,25 +1,52 @@
 import config from './config.js';
 
-const createHTML = (target) => {
-	let _target = target || config.eleTarget;
-	let id = `print-${Date.now().toString().substring(8)}`;
-	let html_str = '<div id="' + id + '">' +
-	  '<div class="styles-wrap">' +
-	    '<style></style>' +
-	    '<pre></pre>' +
-	  '</div>' +
-	  '<div class="resume-wrap">' +
-	    '<div class="resume-tag"></div>' +
-	    '<pre class="resume-markdown"></pre>' +
-	  '</div>' +
-	'</div>';
-	
-	// let _fram = document.createDocumentFragment();
-	// _fram.innerHTML = html_str;
+const _inner_html = Symbol();
+const _create_html = Symbol();
+const _event = Symbol();
+const _init = Symbol();
 
-	document.querySelector(_target).innerHTML = html_str;
-	
-	return Promise.resolve(id);
-};
+class CreateHTML {
+	constructor () {
+		// 记录当前窗口高度
+		this.height = null;
+		// 执行初始化
+		this[_init]();
+	}
+	// 初始化类
+	[_init] () {
+		this[_create_html]();
+		this[_event]();
+	}
 
-export default createHTML;
+	// 构建主题HTML结构
+	[_create_html] (target) {
+		let _target = target || config.eleTarget;
+		let id = `terminal-${Date.now().toString().substring(9)}`;
+		let html_str = '<div id="' + id + '">' +
+		  '<div class="show-wrap"></div>' +
+		'</div>';
+
+		document.querySelector(_target).innerHTML = html_str;
+		
+		this.id = id;
+	}
+
+	// 添加事件监听
+	[_event] () {
+		// 获取当前窗口的高度
+		this.height = document.documentElement.clientHeight;
+		// 监听窗口事件
+		window.addEventListener('resize', () => {
+			this.height = document.documentElement.clientHeight;
+		}, false);
+	}
+
+	// 设置需要显示的内容
+	show (info) {
+		document.querySelector(`#${this.id} .show-wrap`).innerHTML += info;
+	}
+
+}
+
+
+export default CreateHTML;

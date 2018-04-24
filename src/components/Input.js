@@ -41,7 +41,7 @@ class Input {
 		// 初始显示主机名
 		this[_host_name] = option.hostName || config.hostName;
 		// 初始命令提示符号
-		this[_prompt] = option.prompt || config.mountTarget;
+		this[_prompt] = option.prompt || config.prompt;
 		// 挂载目标
 		this[_mount_target] = option.mountTarget || config.mountTarget;
 		// 记录当前地址
