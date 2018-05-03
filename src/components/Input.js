@@ -89,7 +89,7 @@ class Input {
 		let _mount_element = document.querySelector(`${this[_mount_target]}`);
 		_mount_element.appendChild(_fram);
 
-		// 获取挂载元素
+		// 获取已经挂载的输入元素
 		this[_get_elements]();
 	}
 
@@ -99,7 +99,8 @@ class Input {
 	}
 	set input (value) {
 		// 更新页面显示数据
-		this.elements.show_ele.innerText = value;
+		// 首先需要替换非法的字符串
+		this.elements.show_ele.innerHTML = value;
 	}
 
 	// 获取内部组件元素
@@ -120,12 +121,12 @@ class Input {
 		this.elements.input_ele.addEventListener('keyup', (e) => {
 			this.input = e.target.value;
 		}, false);
-		// 监听特色按键
+		// 监听特殊按键
 		this.elements.input_ele.addEventListener('keydown', (e) => {
-
 			// console.log(e.key, e.keyCode);
 			if (key_set.has(e.keyCode) || key_set.has(e.key) ) {
 				switch (e.keyCode) {
+					// 删除按键
 					case 8:
 						this.input = e.target.value;
 						break;
@@ -141,7 +142,7 @@ class Input {
 						this[_terminal_index] = this[_input_text].length - 1;
 						console.log(this[_input_text]);
 						break;
-
+					// 向上按键 
 					case 38:
 						if (this[_terminal_index] > 0) {
 							this[_terminal_index] --;
