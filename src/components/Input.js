@@ -51,6 +51,7 @@ class Input {
 		this.path = '';
 		// 记录当前输入内容
 		this[_input_text] = new Array();
+		// 用于保存当前执行命令的索引
 		this[_terminal_index] = 0;
 		// 记录当前元素className
 		this[_className] = '';
@@ -91,6 +92,7 @@ class Input {
 
 		// 获取已经挂载的输入元素
 		this[_get_elements]();
+		this[_mount] = true;
 	}
 
 	// 创建输入对象
@@ -139,18 +141,37 @@ class Input {
 							this[_input_text].shift();
 						}
 						this[_input_text].push(e.target.value);
+						// 始终将输入记录索引指向最后一个输入值
 						this[_terminal_index] = this[_input_text].length - 1;
-						console.log(this[_input_text]);
+						// console.log(this[_input_text]);
+						// 将当前输入环境清空
+						e.target.value = '';
 						break;
 					// 向上按键 
 					case 38:
+						// 如果当前索引值大于0，那么直接递减索引值
 						if (this[_terminal_index] > 0) {
 							this[_terminal_index] --;
-							this.input = this[_input_text][_terminal_index];
-						} else if (this[_input_text].length > 0){
-							this.input = this[_input_text][0];
+						} else {
+						// 否则将索引值返回到末尾状态	
+							this[_terminal_index] = this[_input_text].length - 1;
 						}
+						// 为什么这里没有将值直接赋值给类的input属性呢
+						// 因为在一旦这里赋值给input属性，那么在keyup事件中将重置该属性的值
+						// 所以这里我们只需要改变input元素中的值即可,然后通过keyup事件传递给input属性
+						e.target.value = this[_input_text][this[_terminal_index]];
 						break;
+					// 向下按键	
+					case 40:
+						// 如果当前索引值大于数组索引，那么将索引直接为0
+						if (this[_terminal_index] >= this[_input_text].length - 1) {
+							this[_terminal_index] = 0;
+						} else {
+						// 否则将索引值返回到末尾状态	
+							this[_terminal_index] ++;
+						}
+						e.target.value = this[_input_text][this[_terminal_index]];
+						break;	
 				}
 			}
 		}, false);
