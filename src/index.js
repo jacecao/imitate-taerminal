@@ -9,3 +9,9 @@ const create_html = new CreateHTML();
 const input = new Input({mountTarget: `#${create_html.id}`});
 
 console.log(create_html.height);
+
+window.addEventListener('keydown', (e) => {
+	if (e.keyCode == 13) {
+		console.log(input.bashStr);
+	}
+});

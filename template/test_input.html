@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>输入光标位置检查</title>
+</head>
+<body>
+	<input id="tbName" type="text"/>
+	<script language="javascript">
+		var tb = document.getElementById("tbName");
+		tb.focus();
+		tb.addEventListener('keyup', function (e) {
+			// var cursorIndex = GetCursorIndexOfTextBox(tb);
+		    // alert("此时光标的index是 "+cursorIndex);
+		    console.log(tb.selectionStart);
+		}, false);
+
+		// ie
+		function GetCursorIndexOfTextBox(obj)
+		{
+		    var workRange = document.selection.createRange();//根据选中的文本区创建一个workRange
+		    var workRange_copy = document.selection.createRange();//根据选中的文本区再创建一个workRange，用于备份textbox的初始状态，便于恢复初始状态
+		    obj.select();//textbox的全部文本被选中
+		    var allRange = document.selection.createRange();//allRange表示全部文本区
+		    workRange.setEndPoint("StartToStart",allRange);//将workRange的开始点移到allRange的开始点
+		    var cursorposition = workRange.text.length;//获取此时的workRange的Text的长度，即为光标所在文本中的Index
+		    workRange.collapse(false);//将workRange的插入点移到workRange的结尾处
+		    workRange_copy.select();//恢复textbox原先的状态
+		    return cursorposition;    //返回光标所在文本的index（从0开始）
+		}
+		console.log(tb.selectionStart);
+	</script>
+</body>
+</html>

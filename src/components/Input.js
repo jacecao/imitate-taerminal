@@ -15,7 +15,10 @@ const _input_text = Symbol();
 const _className = Symbol();
 const _mount_target = Symbol();
 
+const _path = Symbol();
+
 const _terminal_index = Symbol();
+const _throw_bash = Symbol();
 
 const _init = Symbol();
 
@@ -48,7 +51,7 @@ class Input {
 		// 挂载目标
 		this[_mount_target] = option.mountTarget || config.mountTarget;
 		// 记录当前地址
-		this.path = '';
+		this[_path] = '';
 		// 记录当前输入内容
 		this[_input_text] = new Array();
 		// 用于保存当前执行命令的索引
@@ -76,7 +79,7 @@ class Input {
 
 		let _html_str = `
 			<p class="terminal-input">
-				<span class="terminal-header">[${this[_host_name]}${this.path}]${this[_prompt]}</span>
+				<span class="terminal-header">[${this[_host_name]}${this[_path]}]${this[_prompt]}</span>
 				<span class="terminal-text"></span>
 				<input class="watch-input-hook" type="text" value="" autofocus>
 			</p>`;
@@ -97,19 +100,40 @@ class Input {
 
 	// 创建输入对象
 	get input () {
-		return this[_input_text][_terminal_index];
+		return this[_input_text][ this[_terminal_index] ];
 	}
 	set input (value) {
 		// 更新页面显示数据
 		// 首先需要替换非法的字符串
-		this.elements.show_ele.innerHTML = value;
+		if (this[_mount]) {
+			this.elements.show_ele.innerHTML = value;
+		} else {
+			console.error('the input class not mount');
+		}
+		
+	}
+
+	// 创建当前执行地址
+	get path () {
+		return this[_path];
+	}
+	set path (value) {
+		if (this[_mount]) {
+			// 重新录入当前路径
+			this[_path] = value;
+			// 更新页面路径显示
+			this.elements.terminal_header.innerHTML = `[${this[_host_name]}${this[_path]}]${this[_prompt]}`;
+		} else {
+			console.error('the input class not mount');
+		}
 	}
 
 	// 获取内部组件元素
 	[_get_elements] () {
 		this.elements = {
 			input_ele: document.querySelector(`.${this[_className]} .watch-input-hook`),
-			show_ele: document.querySelector(`.${this[_className]} .terminal-text`)
+			show_ele: document.querySelector(`.${this[_className]} .terminal-text`),
+			terminal_header: document.querySelector(`.${this[_className]} .terminal-header`)
 		};
 	}
 
@@ -130,6 +154,9 @@ class Input {
 				switch (e.keyCode) {
 					// 删除按键
 					case 8:
+						// 需要重新设定光标的位置
+						// 让光标的位置始终保持在最末尾
+						e.target.selectionStart = e.target.value.length;
 						this.input = e.target.value;
 						break;
 
@@ -144,6 +171,8 @@ class Input {
 						// 始终将输入记录索引指向最后一个输入值
 						this[_terminal_index] = this[_input_text].length - 1;
 						// console.log(this[_input_text]);
+						// 需要向外抛出当前的信息
+						this[_throw_bash]();
 						// 将当前输入环境清空
 						e.target.value = '';
 						break;
@@ -175,6 +204,18 @@ class Input {
 				}
 			}
 		}, false);
+	}
+
+	// 抛出当前回车后执行的信息
+	[_throw_bash] () {
+		let _html_str = `
+			<p class="terminal-input-ed">
+				[${this[_host_name]}${this[_path]}]${this[_prompt]} ${this.input}
+			</p>`;
+		// 创建用于储存回车后需要执行的命令语句
+		this.bashStr = _html_str;
+		// 当前命令索引需要向前推进一位
+		this[_terminal_index] ++;
 	}
 }
 
