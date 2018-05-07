@@ -1,7 +1,9 @@
 /*
 ** 构建输入模块类
 ** code-by Hiou 2018-4-17
- */
+*/
+
+// todo? 空格录入限制
 
 // 内部私有属性名
 const _host_name = Symbol();
@@ -25,7 +27,11 @@ const _init = Symbol();
 
 // key-char
 // 需要监听的键盘按键名称和编码
-let _key_arr = ['Backspce', 8, 'Enter', 13, 'ArrowUp', 38, 'ArrowDown', 40];
+let _key_arr = [
+	'Backspce', 8, 'Enter', 13, 
+	'ArrowUp', 38, 'ArrowDown', 40, 
+	'ArrowRight', 39, 'ArrowLeft', 37
+];
 const key_set = new Set(_key_arr);
 
 // 默认配置
@@ -33,7 +39,16 @@ const config = {
 	hostName: 'Terminal-SYS',
 	prompt: '$',
 	mountTarget: 'body',
-	storageSize: 10  // 设置需要记录历史操作的最大值
+	storageSize: 10,  // 设置需要记录历史操作的最大值
+	cursorSpace: 10 // 定义光标左右移动值
+};
+
+// 模拟光标移动
+// @ele_cursor 模拟光标元素
+// @ele_input 原始输入框元素（input 元素）
+// @direction 光标移动方向
+const cursorPosition = function (ele_cursor, ele_input, direction) {
+	
 };
 
 // 定义 输入组件类
@@ -80,7 +95,8 @@ class Input {
 		let _html_str = `
 			<p class="terminal-input">
 				<span class="terminal-header">[${this[_host_name]}${this[_path]}]${this[_prompt]}</span>
-				<span class="terminal-text"></span>
+				<code class="terminal-text"></code>
+				<span class="terminal-cursor">.</span>
 				<input class="watch-input-hook" type="text" value="" autofocus>
 			</p>`;
 		let _container = document.createElement('div');
@@ -145,6 +161,7 @@ class Input {
 		}, false);
 		// 输入框绑定键盘监听
 		this.elements.input_ele.addEventListener('keyup', (e) => {
+			// todo 这里应该判断什么时候按键才应该更新显示
 			this.input = e.target.value;
 		}, false);
 		// 监听特殊按键

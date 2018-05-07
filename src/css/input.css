@@ -1,8 +1,10 @@
 .terminal-input {
+	position: relative;
 	height: 16px;
 	line-height: 16px;
+	font-size: 16px;
 }
-.terminal-input::after {
+/* .terminal-input::after {
 	content: '.';
 	display: inline-block;
 	width: 6px;
@@ -11,7 +13,18 @@
 	color: transparent;
 	margin-left: -10px;
 	animation: load-flash 1s infinite;
+} */
+.terminal-cursor {
+	/* position: absolute; */
+	display: inline-block;
+	width: 6px;
+	height: 100%;
+	background: #eee;
+	margin-left: -3px;
+	color: transparent;
+	animation: load-flash 1s infinite;
 }
+
 .terminal-text {
 
 }
