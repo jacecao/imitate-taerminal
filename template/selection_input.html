@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Selection-Input</title>
+</head>
+<body>
+	<h4>Test</h4>
+	test<input id="test" type="text" placeholder="text">
+	<script>
+		let input = document.querySelector('#test');
+		input.addEventListener('keyup', (e) => {
+			console.log('keyup: ' + input.selectionStart);
+		});
+		input.addEventListener('mousedown', (e) => {
+			console.log('mousedown: ' + input.selectionStart);
+		});
+		input.addEventListener('mouseup', (e) => {
+			console.log('mouseup: ' + input.selectionEnd);
+		});
+
+		// 获取当前页面中的选区
+		document.body.addEventListener('mouseup', function (e) {
+			let text = window.getSelection().toString();
+			console.log(text);
+		}, false);
+	</script>
+</body>
+</html>

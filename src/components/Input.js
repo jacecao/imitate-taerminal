@@ -24,12 +24,14 @@ const _throw_bash = Symbol();
 
 const _init = Symbol();
 
+const _cursor_cache = Symbol(); // 记录光标上次移动值
+
 
 // key-char
 // 需要监听的键盘按键名称和编码
 let _key_arr = [
-	'Backspce', 8, 'Enter', 13, 
-	'ArrowUp', 38, 'ArrowDown', 40, 
+	'Backspce', 8, 'Enter', 13,
+	'ArrowUp', 38, 'ArrowDown', 40,
 	'ArrowRight', 39, 'ArrowLeft', 37
 ];
 const key_set = new Set(_key_arr);
@@ -46,14 +48,34 @@ const config = {
 // 模拟光标移动
 // @ele_cursor 模拟光标元素
 // @ele_input 原始输入框元素（input 元素）
-// @direction 光标移动方向
-const cursorPosition = function (ele_cursor, ele_input, direction) {
-	
+const cursorPosition = function (ele_cursor, ele_input, cursor_cache) {
+	// 获取当前光标位置
+	let cursor_end = ele_input.selectionStart;
+	// 检查是否输入了数据
+	let input_value_len = ele_input.value && ele_input.value.length;
+	// 默认光标位移为0
+	let _style = 'translateX(0)';
+	// 当前光标位置如果不在文本末尾，那么才需要执行光标移动操作
+	if (input_value_len && cursor_end !== input_value_len) {
+		// 当前光标移动的总距离
+		let _move_index = input_value_len - cursor_end;
+		// 当前光标位置与上次操作时记录的光标位置的距离差
+		let _define = _move_index - cursor_cache;
+		if (_define > 0) {
+			_style = `translateX(-${_define * config.cursorSpace}px)`;
+		} else {
+			_style = `translateX(${_define * config.cursorSpace}px)`;
+		}
+		// 缓存本次操作的光标位置
+		cursor_cache = cursor_end;
+	}
+	// 改变页面光标显示位置
+	ele_cursor.style.transform = _style;
 };
 
 // 定义 输入组件类
 class Input {
-	
+
 
 	constructor (option) {
 		if (!option) {
@@ -75,6 +97,8 @@ class Input {
 		this[_className] = '';
 		// 元素是否已经挂载到页面
 		this[_mount] = false;
+		// 记录光标上次移动距离
+		this[_cursor_cache] = 0;
 
 		// 执行初始化类
 		this[_init]();
@@ -96,7 +120,7 @@ class Input {
 			<p class="terminal-input">
 				<span class="terminal-header">[${this[_host_name]}${this[_path]}]${this[_prompt]}</span>
 				<code class="terminal-text"></code>
-				<span class="terminal-cursor">.</span>
+				<span class="terminal-cursor cursor-hook">.</span>
 				<input class="watch-input-hook" type="text" value="" autofocus>
 			</p>`;
 		let _container = document.createElement('div');
@@ -126,7 +150,7 @@ class Input {
 		} else {
 			console.error('the input class not mount');
 		}
-		
+
 	}
 
 	// 创建当前执行地址
@@ -149,7 +173,8 @@ class Input {
 		this.elements = {
 			input_ele: document.querySelector(`.${this[_className]} .watch-input-hook`),
 			show_ele: document.querySelector(`.${this[_className]} .terminal-text`),
-			terminal_header: document.querySelector(`.${this[_className]} .terminal-header`)
+			terminal_header: document.querySelector(`.${this[_className]} .terminal-header`),
+			terminal_cursor: document.querySelector(`.${this[_className]} .cursor-hook`)
 		};
 	}
 
@@ -163,6 +188,13 @@ class Input {
 		this.elements.input_ele.addEventListener('keyup', (e) => {
 			// todo 这里应该判断什么时候按键才应该更新显示
 			this.input = e.target.value;
+			switch (e.keyCode) {
+				// 向左向右按键
+				case 37:
+				case 39:
+					cursorPosition(this.elements.terminal_cursor, this.elements.input_ele, this[_cursor_cache]);
+					break;
+			}
 		}, false);
 		// 监听特殊按键
 		this.elements.input_ele.addEventListener('keydown', (e) => {
@@ -173,7 +205,7 @@ class Input {
 					case 8:
 						// 需要重新设定光标的位置
 						// 让光标的位置始终保持在最末尾
-						e.target.selectionStart = e.target.value.length;
+						// e.target.selectionStart = e.target.value.length;
 						this.input = e.target.value;
 						break;
 
@@ -192,32 +224,39 @@ class Input {
 						this[_throw_bash]();
 						// 将当前输入环境清空
 						e.target.value = '';
+						// 将光标位置缓存为0
+						this[_cursor_cache] = 0;
 						break;
-					// 向上按键 
+					// 向上按键
 					case 38:
-						// 如果当前索引值大于0，那么直接递减索引值
-						if (this[_terminal_index] > 0) {
-							this[_terminal_index] --;
-						} else {
-						// 否则将索引值返回到末尾状态	
-							this[_terminal_index] = this[_input_text].length - 1;
+						// 只有输入数组非空的情况下才起作用
+						if (this[_input_text].length > 0) {
+							// 如果当前索引值大于0，那么直接递减索引值
+							if (this[_terminal_index] > 0) {
+								this[_terminal_index] --;
+							} else {
+							// 否则将索引值返回到末尾状态
+								this[_terminal_index] = this[_input_text].length - 1;
+							}
+							// 为什么这里没有将值直接赋值给类的input属性呢
+							// 因为在一旦这里赋值给input属性，那么在keyup事件中将重置该属性的值
+							// 所以这里我们只需要改变input元素中的值即可,然后通过keyup事件传递给input属性
+							e.target.value = this[_input_text][this[_terminal_index]];
 						}
-						// 为什么这里没有将值直接赋值给类的input属性呢
-						// 因为在一旦这里赋值给input属性，那么在keyup事件中将重置该属性的值
-						// 所以这里我们只需要改变input元素中的值即可,然后通过keyup事件传递给input属性
-						e.target.value = this[_input_text][this[_terminal_index]];
 						break;
-					// 向下按键	
+					// 向下按键
 					case 40:
-						// 如果当前索引值大于数组索引，那么将索引直接为0
-						if (this[_terminal_index] >= this[_input_text].length - 1) {
-							this[_terminal_index] = 0;
-						} else {
-						// 否则将索引值返回到末尾状态	
-							this[_terminal_index] ++;
+						if (this[_input_text].length > 0) {
+							// 如果当前索引值大于数组索引，那么将索引直接为0
+							if (this[_terminal_index] >= this[_input_text].length - 1) {
+								this[_terminal_index] = 0;
+							} else {
+							// 否则将索引值返回到末尾状态
+								this[_terminal_index] ++;
+							}
+							e.target.value = this[_input_text][this[_terminal_index]];
 						}
-						e.target.value = this[_input_text][this[_terminal_index]];
-						break;	
+						break;
 				}
 			}
 		}, false);
