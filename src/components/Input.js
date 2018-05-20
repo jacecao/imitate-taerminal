@@ -42,7 +42,7 @@ const config = {
 	prompt: '$',
 	mountTarget: 'body',
 	storageSize: 10,  // 设置需要记录历史操作的最大值
-	cursorSpace: 10 // 定义光标左右移动值
+	cursorSpace: 9 // 定义光标左右移动值
 };
 
 // 模拟光标移动
@@ -138,7 +138,7 @@ class Input {
 		this[_mount] = true;
 	}
 
-	// 创建输入对象
+	// 创建输入属性
 	get input () {
 		return this[_input_text][ this[_terminal_index] ];
 	}
@@ -229,6 +229,8 @@ class Input {
 						break;
 					// 向上按键
 					case 38:
+						// 阻止默认事件
+						e.preventDefault();
 						// 只有输入数组非空的情况下才起作用
 						if (this[_input_text].length > 0) {
 							// 如果当前索引值大于0，那么直接递减索引值
@@ -264,14 +266,11 @@ class Input {
 
 	// 抛出当前回车后执行的信息
 	[_throw_bash] () {
-		let _html_str = `
-			<p class="terminal-input-ed">
-				[${this[_host_name]}${this[_path]}]${this[_prompt]} ${this.input}
-			</p>`;
-		// 创建用于储存回车后需要执行的命令语句
+		let _html_str = `<p class="terminal-input-ed">[${this[_host_name]}${this[_path]}]${this[_prompt]} ${this.input}</p>`;
+		// 创建用于储存回车后需要执行的命令语句html结构
 		this.bashStr = _html_str;
 		// 当前命令索引需要向前推进一位
-		this[_terminal_index] ++;
+		// this[_terminal_index] ++;
 	}
 }
 

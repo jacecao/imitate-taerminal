@@ -4,9 +4,14 @@ body {
 }
 .styles-wrap {
   position: fixed;
-  width: 90vw; 
+  width: 90vw;
   height: 30vh;
   padding: .5em;
   border: 1px solid;
   overflow: hidden;
+}
+.terminal-input-ed {
+	margin: 0;
+	font-size: 14px;
+	color: #2c3035;
 }

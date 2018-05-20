@@ -4,14 +4,15 @@ import './css/input.css';
 import CreateHTML from 'components/CreateHTML.js';
 import Input from 'components/Input.js';
 
-const create_html = new CreateHTML();
+const view = new CreateHTML();
 
-const input = new Input({mountTarget: `#${create_html.id}`});
+const terminal_input = new Input({mountTarget: `#${view.id}`});
 
-console.log(create_html.height);
+console.log(view.height);
 
 window.addEventListener('keydown', (e) => {
 	if (e.keyCode == 13) {
-		console.log(input.bashStr);
+		view.show(terminal_input.bashStr);
+		console.log(terminal_input.input);
 	}
 });
